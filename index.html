@@ -951,9 +951,16 @@ function escapeHtml(t) {
   return d.innerHTML;
 }
 
+// A record can list several units/videos in one field, separated by "; ".
+// Split into the individual values so each can be filtered independently.
+function splitValues(s) {
+  return (s || '').split(';').map(v => v.trim()).filter(Boolean);
+}
+
 function populateFilters() {
-  const units = [...new Set(RAW_RECORDS.map(r => r.unit))].filter(Boolean).sort();
-  const lectures = [...new Set(RAW_RECORDS.map(r => r.lecture))].filter(Boolean).sort();
+  const byNumber = (a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
+  const units = [...new Set(RAW_RECORDS.flatMap(r => splitValues(r.unit)))].sort(byNumber);
+  const lectures = [...new Set(RAW_RECORDS.flatMap(r => splitValues(r.lecture)))].sort(byNumber);
   const mSel = document.getElementById('moduleFilter');
   const lSel = document.getElementById('lectureFilter');
   units.forEach(u => {
@@ -980,8 +987,8 @@ function filterResults() {
       r.unit.toLowerCase().includes(term) ||
       r.lecture.toLowerCase().includes(term) ||
       r.citation.toLowerCase().includes(term);
-    const matchMod = !mod || r.unit === mod;
-    const matchLec = !lec || r.lecture === lec;
+    const matchMod = !mod || splitValues(r.unit).includes(mod);
+    const matchLec = !lec || splitValues(r.lecture).includes(lec);
     return matchSearch && matchMod && matchLec;
   });
   displayResults();
