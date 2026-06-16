@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Module Attribution Search — AI and Ethical Decision Making</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #f4f5f7; color: #1a1a1a; padding: 20px; }
+    .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 8px; padding: 30px; }
+    .header { text-align: center; margin-bottom: 30px; }
+    .header h1 { color: #2c3e50; font-size: 2.2em; margin-bottom: 10px; }
+    .header p { color: #6c757d; font-size: 1.1em; }
+    .search-input { width: 90%; max-width: 900px; padding: 15px 20px; font-size: 16px; border: 2px solid #e9ecef; border-radius: 8px; outline: none; transition: border-color 0.3s; display: block; margin-bottom: 16px; }
+    .search-input:focus { border-color: #0066cc; box-shadow: 0 0 0 3px rgba(0,102,204,0.2); }
+    .filters { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 20px; }
+    .filter-group { display: flex; flex-direction: column; gap: 5px; min-width: 180px; }
+    .filter-group label { font-weight: 600; color: #495057; font-size: 14px; }
+    .filter-select { padding: 8px 12px; border: 2px solid #ced4da; border-radius: 4px; font-size: 14px; background: white; height: 44px; cursor: pointer; }
+    .filter-select:focus { border-color: #0066cc; box-shadow: 0 0 0 3px rgba(0,102,204,0.2); outline: none; }
+    .clear-filters { background: #6c757d; color: white; border: 2px solid #6c757d; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600; height: 44px; align-self: flex-end; }
+    .clear-filters:hover { background: #5a6268; }
+    .results-info { margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid #0066cc; }
+    .results-info::before { content: "Search Results:"; font-weight: 700; color: #0066cc; display: block; font-size: 14px; margin-bottom: 5px; }
+    .results-count { font-weight: 700; color: #1a1a1a; font-size: 16px; }
+    .attribution-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); }
+    .attribution-card { background: white; border: 2px solid #e9ecef; border-radius: 8px; padding: 20px; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; }
+    .attribution-card:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(0,0,0,0.15); border-color: #0066cc; }
+    .card-title { font-size: 16px; font-weight: 600; color: #2c3e50; margin-bottom: 15px; line-height: 1.4; }
+    .card-details { display: grid; gap: 8px; margin-bottom: 15px; }
+    .detail-row { display: flex; gap: 10px; align-items: flex-start; margin-bottom: 8px; }
+    .detail-label { font-weight: 700; color: #6c757d; min-width: 80px; font-size: 13px; flex-shrink: 0; }
+    .detail-value { color: #1a1a1a; font-size: 13px; flex: 1; font-weight: 500; }
+    .citation { background: #f8f9fa; padding: 12px; border-radius: 6px; border-left: 3px solid #28a745; margin-top: 15px; }
+    .citation-label { font-weight: 600; color: #28a745; font-size: 14px; margin-bottom: 5px; }
+    .citation-text { font-size: 14px; color: #1a1a1a; font-style: italic; word-break: break-word; font-weight: 500; }
+    .no-results { text-align: center; padding: 60px 20px; color: #6c757d; }
+    .no-results h3 { margin-bottom: 10px; color: #495057; }
+    .skip-link { position: absolute; top: -40px; left: 6px; background: #000; color: #fff; padding: 8px; text-decoration: none; z-index: 1000; border-radius: 4px; }
+    .skip-link:focus { top: 6px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    @media (prefers-color-scheme: dark) {
+      body { background: #1a1a1a; color: #e9ecef; }
+      .container { background: #2d2d2d; }
+      .header h1 { color: #ffffff; }
+      .search-input, .filter-select { background: #3d3d3d; border-color: #555; color: #e9ecef; }
+      .attribution-card { background: #3d3d3d; border-color: #555; }
+      .citation { background: #4a4a4a; }
+      .results-info { background: #4a4a4a; }
+    }
+    @media (max-width: 768px) {
+      .search-input { width: 100%; }
+      .filters { flex-direction: column; }
+      .attribution-grid { grid-template-columns: 1fr; }
+      .detail-row { flex-direction: column; gap: 4px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .attribution-card { transition: none; }
+    }
+  </style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<div class="container"><header class="header">
+<h1>Module Attribution Search</h1>
+<p>Find citations and attributions for course materials in <b>AI and Ethical Decision Making</b></p>
+</header><main id="main-content">
+<section id="search" role="search" aria-labelledby="search-heading">
+<h2 id="search-heading" class="sr-only">Search and Filter Attribution Records</h2>
+<label for="searchInput" class="sr-only">Search attributions by name, description, location, or citation text</label> <input type="search" class="search-input" id="searchInput" placeholder="Search by name, description, location, or citation..." autocomplete="off" aria-label="Search attribution records" />
+<div class="filters">
+<div class="filter-group"><label for="moduleFilter">Lecture or Unit</label><select class="filter-select" id="moduleFilter">
+<option value="">All Lectures</option>
+</select></div>
+<div class="filter-group"><label for="lectureFilter">Lecture or Video</label><select class="filter-select" id="lectureFilter">
+<option value="">All Lectures</option>
+</select></div>
+<div class="filter-group"><label> </label> <button class="clear-filters" id="clearButton" onclick="clearFilters()" type="button" aria-label="Clear all filters and search terms">Clear All Filters</button></div>
+</div>
+</section>
+<section id="results" aria-labelledby="results-heading">
+<h2 id="results-heading" class="sr-only">Attribution Search Results</h2>
+<div class="results-info" id="resultsInfo" role="status" aria-live="polite" aria-atomic="true">
+<div class="results-count">Loading attribution records...</div>
+</div>
+<div class="attribution-grid" id="attributionGrid"></div>
+<div class="no-results" id="noResults" style="display: none;" role="status" aria-live="polite">
+<h3>No attribution records found</h3>
+<p>No results match your current search terms or filters. Try different keywords or clear some filters to see more results.</p>
+</div>
+</section>
+</main></div>
+<script>
+const RAW_RECORDS = [
+  {
+    id: `1`,
+    name: `3D bar chart image`,
+    location: `UAI.EDM.1`,
+    unit: `Module Summary`,
+    lecture: `Wrap Up`,
+    citation: `3D Bar Graph Showing Growth image by guitargoa on FreeImages`
+  },
+  {
+    id: `2`,
+    name: `Cartoon computer holding a wrench illustration`,
+    location: `UAI.EDM.1`,
+    unit: `Module Summary`,
+    lecture: `Wrap Up`,
+    citation: `Computer repair clipart via PNGitem`
+  },
+  {
+    id: `3`,
+    name: `GDPR image`,
+    location: `UAI.EDM.1`,
+    unit: `Module Summary`,
+    lecture: `Wrap Up`,
+    citation: `General Data Protection Regulation image © European Union. All rights reserved.`
+  },
+  {
+    id: `4`,
+    name: `Screenshot of Forbes "US AI Policy Pivots Sharply From Safety to 'Security'" article`,
+    location: `UAI.EDM.1`,
+    unit: `Module Summary`,
+    lecture: `Wrap Up`,
+    citation: `Screenshot of Forbes "US AI Policy Pivots Sharply From Safety to 'Security'" article by Uttara Sivaram. © Forbes Media LLC, 2025. All rights reserved.`
+  },
+  {
+    id: `5`,
+    name: `Image of human hand and robotic hand reaching fingertips`,
+    location: `UAI.EDM.1`,
+    unit: `Module Summary`,
+    lecture: `Wrap Up`,
+    citation: `A human hand reaching towards a robotic hand symbolizing technology and connection by Tara Winstead via Pexels`
+  },
+  {
+    id: `6`,
+    name: `Chevron logo`,
+    location: `UAI.EDM.1`,
+    unit: `L1.1`,
+    lecture: `What is Data, Models, and Decisions: Introduction`,
+    citation: `Chevron logo © Chevron Corporation. All rights reserved.`
+  },
+  {
+    id: `7`,
+    name: `Mastercard logo`,
+    location: `UAI.EDM.1`,
+    unit: `L1.1`,
+    lecture: `What is Data, Models, and Decisions: Introduction`,
+    citation: `Mastercard logo © Mastercard. All rights reserved.`
+  },
+  {
+    id: `8`,
+    name: `Instagram logo`,
+    location: `UAI.EDM.1`,
+    unit: `L1.1`,
+    lecture: `What is Data, Models, and Decisions: Introduction`,
+    citation: `Instagram logo © Meta Platforms, Inc. All rights reserved.`
+  },
+  {
+    id: `9`,
+    name: `Spotify logo`,
+    location: `UAI.EDM.1`,
+    unit: `L1.1`,
+    lecture: `What is Data, Models, and Decisions: Introduction`,
+    citation: `Spotify logo © Spotify AB. All rights reserved.`
+  },
+  {
+    id: `10`,
+    name: `Zillow logo`,
+    location: `UAI.EDM.1`,
+    unit: `L1.1`,
+    lecture: `What is Data, Models, and Decisions: Introduction`,
+    citation: `Zillow logo © Zillow. All rights reserved.`
+  },
+  {
+    id: `11`,
+    name: `ZARA logo`,
+    location: `UAI.EDM.1`,
+    unit: `L1.1`,
+    lecture: `What is Data, Models, and Decisions: Introduction`,
+    citation: `ZARA logo © Industria de Diseño Textil, S.A. (Inditex). All rights reserved.`
+  },
+  {
+    id: `12`,
+    name: `Macy's logo`,
+    location: `UAI.EDM.1`,
+    unit: `L1.1`,
+    lecture: `What is Data, Models, and Decisions: Introduction`,
+    citation: `Macy's logo © Macy's. All rights reserved.`
+  },
+  {
+    id: `13`,
+    name: `United Airlines logo`,
+    location: `UAI.EDM.1`,
+    unit: `L1.1`,
+    lecture: `What is Data, Models, and Decisions: Introduction`,
+    citation: `United logo © United Airlines, Inc. All rights reserved.`
+  },
+  {
+    id: `14`,
+    name: `Photo illustration of racial profiling`,
+    location: `UAI.EDM.1`,
+    unit: `L1.1`,
+    lecture: `What is Data, Models, and Decisions: Introduction`,
+    citation: `"This is why everyday racial profiling is so dangerous." Photo-Illustration by Sofia Ordonez/Shutterstock/CNN © Cable News Network, 2018. All rights reserved.`
+  },
+  {
+    id: `15`,
+    name: `Amazon logo`,
+    location: `UAI.EDM.1`,
+    unit: `L1.1`,
+    lecture: `What is Data, Models, and Decisions: Introduction`,
+    citation: `Amazon logo © Amazon.com, Inc. All rights reserved.`
+  },
+  {
+    id: `16`,
+    name: `Netflix logo`,
+    location: `UAI.EDM.1`,
+    unit: `L1.1`,
+    lecture: `What is Data, Models, and Decisions: Introduction`,
+    citation: `Netflix logo © Netflix, Inc. All rights reserved.`
+  },
+  {
+    id: `17`,
+    name: `Uber logo`,
+    location: `UAI.EDM.1`,
+    unit: `L1.1`,
+    lecture: `What is Data, Models, and Decisions: Introduction`,
+    citation: `Uber logo © Uber Technologies, Inc. All rights reserved.`
+  },
+  {
+    id: `18`,
+    name: `Los Angeles Times article screenshot`,
+    location: `UAI.EDM.1`,
+    unit: `L1.1; L.5`,
+    lecture: `What is Data, Models, and Decisions: Introduction; What is Data Models, and Decisions: Feedback Loops`,
+    citation: `LA times screenshot of "Moving to a climate-disaster zone just to afford a home" by Ivis García © Los Angeles Times, 2025. All rights reserved.`
+  },
+  {
+    id: `19`,
+    name: `Cartoon businesspeople illustration`,
+    location: `UAI.EDM.1`,
+    unit: `L1.1; L1.2; L1.3; L1.5; L1.6; L3.10; L3.12`,
+    lecture: `What is Data, Models, and Decisions: Introduction`,
+    citation: `Ai Generated, Group, Team image by ghasoub via Pixabay`
+  },
+  {
+    id: `20`,
+    name: `Los Angeles Times article screenshot`,
+    location: `UAI.EDM.1`,
+    unit: `L1.1; L1.6`,
+    lecture: `What is Data, Models, and Decisions: Introduction`,
+    citation: `Screenshot of LA Times article,"PG&E power outages bring darkness, stress and debt to California's poor and elderly" by Anita Chabria and Taryn Luna © Los Angeles Times, 2019. All rights reserved.`
+  },
+  {
+    id: `21`,
+    name: `"Increasing power outages don't hit everyone equally"`,
+    location: `UAI.EDM.1`,
+    unit: `L1.6`,
+    lecture: `What does Ethical Mean?`,
+    citation: `Screenshot of Scientific American article "Increasing Power Outages Don't Hit Everyone Equally" by June Kim, edited by Andrea Thompson, 2023.  © Scientific American, a division of Springer Nature America, Inc., 2023. All rights reserved.`
+  },
+  {
+    id: `22`,
+    name: `Reuters article screenshot "Tesla ordered by Florida jury to pay $243 million in fatal Autopilot crash"`,
+    location: `UAI.EDM.1`,
+    unit: `L1.7`,
+    lecture: `Examples of Unintended Consequences`,
+    citation: `Screenshot of "Tesla ordered by Florida jury to pay $243 million in fatal Autopilot crash" article by Jonathan Stempel and Abhirup Roy © Reuters, 2025. All rights reserved.`
+  },
+  {
+    id: `23`,
+    name: `NOYB screenshot of "Criminal complaint against facial recognition company Clearview AI"`,
+    location: `UAI.EDM.1`,
+    unit: `L1.7`,
+    lecture: `Examples of Unintended Consequences`,
+    citation: `Screenshot of "Criminal complaint against facial recognition company Clearview AI" NOYB article © NOYB, Verein, 2025 (CC BY-NC 3.0)`
+  },
+  {
+    id: `24`,
+    name: `The Wire screenshot "Companies Gain, Elders Lose in Rajasthan's Turn to 'Cradle to Grave' Digital Governance"`,
+    location: `UAI.EDM.1`,
+    unit: `L1.7`,
+    lecture: `Examples of Unintended Consequences`,
+    citation: `Screenshot of "Companies Gain, Elders Lose in Rajasthan's Turn to 'Cradle to Grave' Digital Governance" © Foundation for Independent Journalism (FIJ), 2025. All rights reserved.`
+  },
+  {
+    id: `25`,
+    name: `Screenshot of rest of world "Brazil's AI social security app rejected" article`,
+    location: `UAI.EDM.1`,
+    unit: `L1.7`,
+    lecture: `Examples of Unintended Consequences`,
+    citation: `Screenshot of "Brazil's AI social security app rejected" article b Gabriel Daros © Rest of World, 2025. All rights reserved.`
+  },
+  {
+    id: `26`,
+    name: `Pulitzer Center screenshot of "An Atlas of India's Digitally Invisible"`,
+    location: `UAI.EDM.1`,
+    unit: `L1.7`,
+    lecture: `Examples of Unintended Consequences`,
+    citation: `Screenshot of "An Atlas of India's Digitally Invisible" article by Anumeha Yadav © Pulitzer Center, 2025. All rights reserved.`
+  },
+  {
+    id: `27`,
+    name: `Reuters screenshot "AI assistants make widespread errors about the news, new research shows"`,
+    location: `UAI.EDM.1`,
+    unit: `L1.7`,
+    lecture: `Examples of Unintended Consequences`,
+    citation: `Screenshot of "AI assistants make widespread errors about the news, new research shows" article by Olivia Le Poidevin © Reuters, 2025. All rights reserved.`
+  },
+  {
+    id: `28`,
+    name: `Brown article screenshot "New study: AI chatbots systematically violate mental health ethics standards"`,
+    location: `UAI.EDM.1`,
+    unit: `L1.7`,
+    lecture: `Examples of Unintended Consequences`,
+    citation: `Screenshot of "New study: AI chatbots systematically violate mental health ethics standards" article © Brown University, 2025. All rights reserved.`
+  },
+  {
+    id: `29`,
+    name: `Reuters screenshot "Meta's AI rules have let bots hold 'sensual' chats with kids, offer false medical info"`,
+    location: `UAI.EDM.1`,
+    unit: `L1.7`,
+    lecture: `Examples of Unintended Consequences`,
+    citation: `Screenshot of "Meta's AI rules have let bots hold 'sensual' chats with kids, offer false medical info" article by Jeff Horwitz © Reuters, 2025. All rights reserved.`
+  },
+  {
+    id: `30`,
+    name: `Lincoln Institute screenshot "Data Drain: The Land and Water Impacts of the AI Boom"`,
+    location: `UAI.EDM.1`,
+    unit: `L1.7`,
+    lecture: `Examples of Unintended Consequences`,
+    citation: `Screenshot of "Data Drain: The Land and Water Impacts of the AI Boom" article by Jon Gorey © Lincoln Institute of Land Policy, 2025. All rights reserved.`
+  },
+  {
+    id: `31`,
+    name: `Bloomberg article screenshot "Amazon to Bring Same-Day Delivery to Roxbury After Outcry"`,
+    location: `UAI.EDM.1`,
+    unit: `L1.7`,
+    lecture: `Examples of Unintended Consequences`,
+    citation: `Screenshot of "Amazon to Bring Same-Day Delivery to Roxbury After Outcry" article © Bloomberg L.P, 2016. All rights reserved.`
+  },
+  {
+    id: `32`,
+    name: `Bloomberg article screenshot and image Amazon Doesn't Consider the Race of Its Customers. Should It?"`,
+    location: `UAI.EDM.1`,
+    unit: `L1.7`,
+    lecture: `Examples of Unintended Consequences`,
+    citation: `Screenshot of "Amazon Doesn't Consider the Race of Its Customers. Should It?" by By David Ingold and Spencer Soper© Bloomberg L.P., 2016. All rights reserved.`
+  },
+  {
+    id: `33`,
+    name: `Carnegie Mellon screenshot "Fewer women than men are shown online ads related to high-paying jobs"`,
+    location: `UAI.EDM.1`,
+    unit: `L1.7`,
+    lecture: `Examples of Unintended Consequences`,
+    citation: `Screenshot of "Fewer women than men are shown online ads related to high-paying jobs " article by Byron Spice © Carnegie Mellon University, 2015. All rights reserved.`
+  },
+  {
+    id: `34`,
+    name: `The Guardian screenshot "Uber hit with legal demands to halt use of AI-driven pay systems"`,
+    location: `UAI.EDM.1`,
+    unit: `L1.7`,
+    lecture: `Examples of Unintended Consequences`,
+    citation: `Screenshot of "Uber hit with legal demands to halt use of AI-driven pay systems" article by Simon Goodley © Guardian News & Media Limited, 2025. All rights reserved`
+  },
+  {
+    id: `35`,
+    name: `The Guardian screenshot of "DWP algorithm wrongly flags 200,000 people for possible fraud and error"`,
+    location: `UAI.EDM.1`,
+    unit: `L1.7`,
+    lecture: `Examples of Unintended Consequences`,
+    citation: `Screenshot of "DWP algorithm wrongly flags 200,000 people for possible fraud and error" article by Robert Booth © Guardian News & Media Limited, 2024. All rights reserved.`
+  },
+  {
+    id: `36`,
+    name: `Amnesty International screenshot "France: Discriminatory algorithm used by the social security agency must be stopped"`,
+    location: `UAI.EDM.1`,
+    unit: `L1.7`,
+    lecture: `Examples of Unintended Consequences`,
+    citation: `Screenshot of "France: Discriminatory algorithm used by the social security agency must be stopped" article © Amnesty International, 2024. All rights reserved.`
+  },
+  {
+    id: `37`,
+    name: `CBS News screenshot "Microsoft shuts down AI chatbot after it turned into a racist Nazi"`,
+    location: `UAI.EDM.1`,
+    unit: `L1.7`,
+    lecture: `Examples of Unintended Consequences`,
+    citation: `Screenshot of "Microsoft shuts down AI chatbot after it turned into a racist Nazi" article by Amy Kraft © CBS Interactive Inc., 2016. All rights reserved.`
+  },
+  {
+    id: `38`,
+    name: `The Guardian screenshot "Air Canada ordered to pay customer who was misled by airline's chatbot"`,
+    location: `UAI.EDM.1`,
+    unit: `L1.7`,
+    lecture: `Examples of Unintended Consequences`,
+    citation: `Screenshot of "Air Canada ordered to pay customer who was misled by airline's chatbot" article by Leyland Cecco © Guardian News & Media Limited, 2024. All rights reserved.`
+  },
+  {
+    id: `39`,
+    name: `Public Safety Power Shutoff (PSPS) logo`,
+    location: `UAI.EDM.1`,
+    unit: `L1.1; Module Summary`,
+    lecture: `What is Data, Models, and Decisions: Introduction; Wrap Up`,
+    citation: `Public Safety Power Shutoff logo, California Public Utilities Commission © State of California. All rights reserved.`
+  },
+  {
+    id: `40`,
+    name: `CAP screenshot "The National Baby Formula Shortage and the Inequitable U.S. Food System"`,
+    location: `UAI.EDM.1`,
+    unit: `L1.7; L2.6`,
+    lecture: `Examples of Unintended Consequences; Interplay of Optimization and Prediction: Supply Chain Examples`,
+    citation: `Screenshot of "The National Baby Formula Shortage and the Inequitable U.S. Food System" article © Center for American Progress, 2022. All rights reserved.`
+  },
+  {
+    id: `41`,
+    name: `Artificial Intelligence human head silhouette image`,
+    location: `UAI.EDM.1`,
+    unit: `L1.1; L1.2; L1.3; L1.5; L1.6; L3.10; L3.12`,
+    lecture: `What is Data, Models, and Decisions: Introduction`,
+    citation: `Ai Generated, Circuit, Head illustration by justDIYteam via Pixabay`
+  },
+  {
+    id: `42`,
+    name: `Judge gavel photo`,
+    location: `UAI.EDM.1`,
+    unit: `L1.1; L1.3; L1.5; L1.6; L3.10; Module Summary`,
+    lecture: `What is Data, Models, and Decisions: Introduction; Wrap Up`,
+    citation: `Hammer, Auction, Authority image by Clker-Free-Vector-Images via Pixabay`
+  },
+  {
+    id: `43`,
+    name: `The Guardian screenshots of LAPD article`,
+    location: `UAI.EDM.1`,
+    unit: `L2.1`,
+    lecture: `Noise and Uncertainty in Data: Introduction`,
+    citation: `Screenshots of "LAPD ended predictive policing programs amid public outcry. A new effort shares many of their flaws" article by Johana Bhuiyan © Guardian News & Media Limited, 2021. All rights reserved.`
+  },
+  {
+    id: `44`,
+    name: `Heat maps of drug arrests made and drug-related health incidents`,
+    location: `UAI.EDM.1`,
+    unit: `L2.1; L2.2`,
+    lecture: `Noise and Uncertainty in Data: Introduction; Noise and Uncertainty in Data: "Biased" Proxies & Missing Data`,
+    citation: `Figure 1 (a) Number of drug arrests made by Oakland police department, 2010. (1) West Oakland, (2) International Boulevard. (b) Estimated number of drug users, based on 2011 National Survey on Drug Use and Health. Kristian Lum, William Isaac, To Predict and Serve?, Significance, Volume 13, Issue 5, October 2016, Pages 14–19, https://doi.org/10.1111/j.1740-9713.2016.00960.x © Royal Statistical Society, 2016. All rights reserved.`
+  },
+  {
+    id: `45`,
+    name: `ACM research article screenshot`,
+    location: `UAI.EDM.1`,
+    unit: `L2.2`,
+    lecture: `Noise and Uncertainty in Data: "Biased" Proxies & Missing Data`,
+    citation: `Screenshot of Kabir, S., Uddin, D. N., Kou, B., Zhang, T. (2023). Is Stack Overflow Obsolete? An Empirical Study of the Characteristics of ChatGPT Answers to Stack Overflow Questions. CHI '24: Proceedings of the 2024 CHI Conference on Human Factors in Computing Systems) © The Authors (CC BY-NC 4.0)`
+  },
+  {
+    id: `46`,
+    name: `Screenshot and figure from "Are Large Language Models a Threat to Digital Public Goods?"`,
+    location: `UAI.EDM.1`,
+    unit: `L2.2`,
+    lecture: `Noise and Uncertainty in Data: "Biased" Proxies & Missing Data`,
+    citation: `Screenshot and Figure 1 from del Rio-Chanona, M., Laurentsyeva, N., Wachs, J. "Are Large Language Models a Threat to Digital Public Goods? Evidence from Activity on Stack Overflow." arXiv preprint, 2023. (CC BY 4.0)`
+  },
+  {
+    id: `47`,
+    name: `Figure 2 drug crimes`,
+    location: `UAI.EDM.1`,
+    unit: `L2.2`,
+    lecture: `Noise and Uncertainty in Data: "Biased" Proxies & Missing Data`,
+    citation: `Figure 2 (a) Number of days with targeted policing for drug crimes in areas flagged by PredPol analysis of Oakland police data. (b) Targeted policing for drug crimes, by race. (c) Estimated drug use by race Kristian Lum, William Isaac, To Predict and Serve?, Significance, Volume 13, Issue 5, October 2016, Pages 14–19, https://doi.org/10.1111/j.1740-9713.2016.00960.x © Royal Statistical Society, 2016. All rights reserved.`
+  },
+  {
+    id: `48`,
+    name: `UNOS logo`,
+    location: `UAI.EDM.1`,
+    unit: `L2.3`,
+    lecture: `Noise and Uncertainty in Data: Examples for Problems with Missing or Noisy Data`,
+    citation: `UNOS logo © United Network for Organ Sharing. All rights reserved.`
+  },
+  {
+    id: `49`,
+    name: `Reuters screenshot of "Amazon scraps secret AI recruiting tool that showed bias against women"`,
+    location: `UAI.EDM.1`,
+    unit: `L2.3`,
+    lecture: `Noise and Uncertainty in Data: Examples for Problems with Missing or Noisy Data`,
+    citation: `Screenshot of "Amazon scraps secret AI recruiting tool that showed bias against women" article by Jeffrey Dastin © Reuters, 2018. All rights reserved.`
+  },
+  {
+    id: `50`,
+    name: `Screenshot of "Algorithmic monoculture and social welfare" article`,
+    location: `UAI.EDM.1`,
+    unit: `L2.3`,
+    lecture: `Noise and Uncertainty in Data: Examples for Problems with Missing or Noisy Data`,
+    citation: `Screenshot of "Algorithmic monoculture and social welfare" article J. Kleinberg, & M. Raghavan, Algorithmic monoculture and social welfare, Proc. Natl. Acad. Sci. U.S.A. 118 (22) e2018340118, https://doi.org/10.1073/pnas.2018340118 (2021). Published under the PNAS license. © The Authors, 2021. All rights reserved.`
+  },
+  {
+    id: `51`,
+    name: `Opportunity@Work logo`,
+    location: `UAI.EDM.1`,
+    unit: `L2.3`,
+    lecture: `Noise and Uncertainty in Data: Examples for Problems with Missing or Noisy Data`,
+    citation: `Opportunity@Work logo © Opportunity@Work. All rights reserved.`
+  },
+  {
+    id: `52`,
+    name: `Screenshot of "Five States Join Ambitious Nationwide Effort to 'Tear The Paper Ceiling' and Accelerate Opportunity for Workers Skilled Through Alternative Routes (STARs)"`,
+    location: `UAI.EDM.1`,
+    unit: `L2.3`,
+    lecture: `Noise and Uncertainty in Data: Examples for Problems with Missing or Noisy Data`,
+    citation: `Screenshot of "Five States Join Ambitious Nationwide Effort to 'Tear The Paper Ceiling' and Accelerate Opportunity for Workers Skilled Through Alternative Routes (STARs)" article, PR Newswire by Cision. News provided by Opportunity@Work. © Cision US Inc., 2024. All rights reserved.`
+  },
+  {
+    id: `53`,
+    name: `Screenshot of "Limitations of the Mini-Mental State Examination" article`,
+    location: `UAI.EDM.1`,
+    unit: `L2.3`,
+    lecture: `Noise and Uncertainty in Data: Examples for Problems with Missing or Noisy Data`,
+    citation: `Screenshot of "Limitations of the Mini-Mental State Examination" article. Naugle RI, Kawczak K. Limitations of the Mini-Mental State Examination. Cleve Clin J Med. 1989 May;56(3):277-81. doi: 10.3949/ccjm.56.3.277. PMID: 2743549. © The Cleveland Clinic Foundation, 1989. All rights reserved.`
+  },
+  {
+    id: `54`,
+    name: `New York Times article screenshot`,
+    location: `UAI.EDM.1`,
+    unit: `L2.3`,
+    lecture: `Noise and Uncertainty in Data: Examples for Problems with Missing or Noisy Data`,
+    citation: `Screenshot of "Mapping Potholes by Phone (the West Bank's Roads Were Smoother)" article by Mark Gardiner © The New York Times Company, 2020. All rights reserved.`
+  },
+  {
+    id: `55`,
+    name: `Lose money image`,
+    location: `UAI.EDM.1`,
+    unit: `L2.3`,
+    lecture: `Noise and Uncertainty in Data: Examples for Problems with Missing or Noisy Data`,
+    citation: `Illustration of a cartoon character struggling with a large coin symbolizing financial loss by Monstera Production via Pexels`
+  },
+  {
+    id: `56`,
+    name: `Medical diagram of kidneys`,
+    location: `UAI.EDM.1`,
+    unit: `L2.3`,
+    lecture: `Noise and Uncertainty in Data: Examples for Problems with Missing or Noisy Data`,
+    citation: `Male figure with the kidneys labeled. National Institute of Diabetes and Digestive and Kidney Diseases, National Institutes of Health. This work is in the public domain.`
+  },
+  {
+    id: `57`,
+    name: `Data pipeline machine learning engineering graphic`,
+    location: `UAI.EDM.1`,
+    unit: `L2.4`,
+    lecture: `Interplay of Optimization and Prediction: Introduction`,
+    citation: `ML workflow figure. An Overview of the End-to-End Machine Learning Workflow. By INNOQ (CC BY 4.0)`
+  },
+  {
+    id: `58`,
+    name: `De Gruyter Open article screenshot`,
+    location: `UAI.EDM.1`,
+    unit: `L2.4`,
+    lecture: `Interplay of Optimization and Prediction: Introduction`,
+    citation: `Screenshot of De Gruyter Open article. Datta, Amit, Michael Carl Tschantz, and Anupam Datta. "Automated experiments on ad privacy settings: A tale of opacity, choice, and discrimination." Proceedings on Privacy Enhancing Technologies, 2015. © The Authors, 2015. All rights reserved.`
+  },
+  {
+    id: `59`,
+    name: `Screenshot of "Time-of-Use Electricity Rates May Hit Vulnerable Groups Harder, Study Finds"`,
+    location: `UAI.EDM.1`,
+    unit: `L2.6`,
+    lecture: `Interplay of Optimization and Prediction: Supply Chain Examples`,
+    citation: `Screenshot of "Time-of-Use Electricity Rates May Hit Vulnerable Groups Harder, Study Finds" IEEE Spectrum article by Maria Gallucci © IEEE, 2019. All rights reserved.`
+  },
+  {
+    id: `60`,
+    name: `Screenshot of "Why doesn't Amazon offer same-day delivery in Roxbury?" article`,
+    location: `UAI.EDM.1`,
+    unit: `L2.6`,
+    lecture: `Interplay of Optimization and Prediction: Supply Chain Examples`,
+    citation: `Screenshot of "Why doesn't Amazon offer same-day delivery in Roxbury?" article by Dan Adams, Meghan E. Irons, and Megan Woolhouse © Boston Globe Media Partners, LLC, 2016. All rights reserved.`
+  },
+  {
+    id: `61`,
+    name: `Screenshot of "Sutter Health says Alta Bates will stay open for at least another decade"`,
+    location: `UAI.EDM.1`,
+    unit: `L2.7`,
+    lecture: `Underspecified and Misaligned Objectives: Optimization Criteria`,
+    citation: `Screenshot of "Sutter Health says Alta Bates will stay open for at least another decade" KTVU Fox 2 article © FOX Television Stations, 2018. All rights reserved.`
+  },
+  {
+    id: `62`,
+    name: `Berkeley community protest against Alta Bates closure photo`,
+    location: `UAI.EDM.1`,
+    unit: `L2.7`,
+    lecture: `Underspecified and Misaligned Objectives: Optimization Criteria`,
+    citation: `On Sunday Nov. 5, protesters wave to passing vehicles on Ashby Avenue to prevent Sutter Health from stripping acute care services at Alta Bates. Photo by David Yee via Berkeleyside. © Cityside, 2017. All rights reserved.`
+  },
+  {
+    id: `63`,
+    name: `Alta Bates Summit Medical Center photo`,
+    location: `UAI.EDM.1`,
+    unit: `L2.7`,
+    lecture: `Underspecified and Misaligned Objectives: Optimization Criteria`,
+    citation: `Alta Bates Summit Medical Center, Summit Campus in Oakland, California. Photo by Coolcaesar (CC BY-SA 3.0) via Wikimedia Commons`
+  },
+  {
+    id: `64`,
+    name: `Morality by Country figure`,
+    location: `UAI.EDM.1`,
+    unit: `L2.8`,
+    lecture: `Underspecified and Misaligned Objectives: Moral Dilemmas`,
+    citation: `Figure from Awad, Edmond et. al "Crowdsourcing moral machines" Communications of the ACM, Volume 63, Issue 3 © ACM, 2020. All rights reserved.`
+  },
+  {
+    id: `65`,
+    name: `Portrait of Philippa Foot`,
+    location: `UAI.EDM.1`,
+    unit: `L2.8`,
+    lecture: `Underspecified and Misaligned Objectives: Optimization Criteria`,
+    citation: `Philippa Foot portrait screenshot from Philippa Foot Wikipedia page (CC BY-SA 4.0)`
+  },
+  {
+    id: `66`,
+    name: `Cornell Chronicle Uber drivers article screenshot`,
+    location: `UAI.EDM.1`,
+    unit: `L2.3; L3.9`,
+    lecture: `Noise and Uncertainty in Data: Examples for Problems with Missing or Noisy Data; Handling Noise: Data and Model Uncertainty`,
+    citation: `Screenshot of "Rating systems may discriminate against Uber drivers" article by Leslie Morris, Cornell Chronicle © Cornell University, 2016. All rights reserved.`
+  },
+  {
+    id: `67`,
+    name: `Are Emily and Greg More Employable Than Lakisha and Jamal? A Field Experiment on Labor Market Discrimination`,
+    location: `UAI.EDM.1`,
+    unit: `L2.3; L3.9`,
+    lecture: `Noise and Uncertainty in Data: Examples for Problems with Missing or Noisy Data; Handling Noise: Data and Model Uncertainty`,
+    citation: `Screenshot of "Are Emily and Greg More Employable Than Lakisha and Jamal? A Field Experiment on Labor Market Discrimination" article by Marianne Bertrand and Sendhil Mullainathan. © National Bureau of Economic Research, 2003. All rights reserved.`
+  },
+  {
+    id: `68`,
+    name: `Screenshot of "Why does John get the STEM job rather than Jennifer?" article`,
+    location: `UAI.EDM.1`,
+    unit: `L2.3; L3.9`,
+    lecture: `Noise and Uncertainty in Data: Examples for Problems with Missing or Noisy Data; Handling Noise: Data and Model Uncertainty`,
+    citation: `Screenshot of "Why does John get the STEM job rather than Jennifer?" article © Stanford University, 2014. All rights reserved.`
+  },
+  {
+    id: `69`,
+    name: `Screenshot of "Racial Discrimination in the Sharing Economy: Evidence from a Field Experiment"`,
+    location: `UAI.EDM.1`,
+    unit: `L2.3; L3.9`,
+    lecture: `Noise and Uncertainty in Data: Examples for Problems with Missing or Noisy Data; Handling Noise: Data and Model Uncertainty`,
+    citation: `Screenshot of "Racial Discrimination in the Sharing Economy: Evidence from a Field Experiment" article by Benjamin Edelman, Michael Luca, and Dan Svirsky. American Economic Journal: Applied Economics © American Economic Association, 2017. All rights reserved.`
+  },
+  {
+    id: `70`,
+    name: `Spinning plates figure icon`,
+    location: `UAI.EDM.1`,
+    unit: `L2.7; L3.11`,
+    lecture: `Underspecified and Misaligned Objectives: Optimization Criteria; Aligning Goals: Navigating Competing Objectives`,
+    citation: `Spinning plates figure icon. © WSDOT. All rights reserved.`
+  },
+  {
+    id: `71`,
+    name: `Business board room cartoon image`,
+    location: `UAI.EDM.1`,
+    unit: `L2.8; L3.4; L3.11`,
+    lecture: `Underspecified and Misaligned Objectives: Moral Dilemmas; Detecting and Diagnosing Problems: Model Evaluation; Aligning Goals: Navigating Competing Objectives`,
+    citation: `Meeting, Business, Brainstorming image by GraphicMama-team via Pixabay.`
+  },
+  {
+    id: `72`,
+    name: `Diagram showing the Trolley Problem`,
+    location: `UAI.EDM.1`,
+    unit: `L2.8; L3.4; Module Summary`,
+    lecture: `Underspecified and Misaligned Objectives: Moral Dilemmas; Detecting and Diagnosing Problems: Model Evaluation; Wrap Up`,
+    citation: `Trolley problem diagram based on work by McGeddon. By user Zapyon (CC BY-SA 4.0) via Wikimedia Commons.`
+  },
+  {
+    id: `73`,
+    name: `Tug of war competition`,
+    location: `UAI.EDM.1`,
+    unit: `L3.10`,
+    lecture: `Aligning Goals: Encoding Values in Objectives`,
+    citation: `Tug of war competition two teams pull rope. Image by upklyak designed by Freepik from www.magnific.com`
+  },
+  {
+    id: `74`,
+    name: `Hospital icon`,
+    location: `UAI.EDM.1`,
+    unit: `L3.11`,
+    lecture: `Aligning Goals: Navigating Competing Objectives`,
+    citation: `Hospital icon via World Health Organization "How to use this toolkit" © WHO. All rights reserved.`
+  },
+  {
+    id: `75`,
+    name: `Image of human figure standing in front of an AI head`,
+    location: `UAI.EDM.1`,
+    unit: `L3.12`,
+    lecture: `Aligning Goals: Competing Objectives in Resource Allocation`,
+    citation: `Image of human and AI from "Is AI Destroying Human Connections? The Dark Side of Artificial Intelligence" by Alex Northwood via medium.com © Alex Northwood, 2023. All rights reserved.`
+  },
+  {
+    id: `76`,
+    name: `Reinforcement Learning in ML diagram`,
+    location: `UAI.EDM.1`,
+    unit: `L3.12`,
+    lecture: `Aligning Goals: Competing Objectives in Resource Allocation`,
+    citation: `Reinforcement Learning in ML diagram by TechVidvan © DataFlair Web Services Pvt. Ltd. All rights reserved.`
+  },
+  {
+    id: `77`,
+    name: `Crowd illustration`,
+    location: `UAI.EDM.1`,
+    unit: `L3.12`,
+    lecture: `Aligning Goals: Competing Objectives in Resource Allocation`,
+    citation: `Screenshot of New Yorker "The Future of Democracy" crowd animation. Illustration by Christoph Niemann; Animation by Olivia Blanc © Condé Nast. All rights reserved.`
+  },
+  {
+    id: `78`,
+    name: `Figure 1: a beneficiary receiving preventive health information`,
+    location: `UAI.EDM.1`,
+    unit: `L3.12`,
+    lecture: `Aligning Goals: Competing Objectives in Resource Allocation`,
+    citation: `Figure 1: A beneficiary receiving preventive health information from Verma, S., G.Singh, A.Mate, P.Verma, S.Gorantla, N.Madhiwalla, A.Hegde, D.Thakkar, M.Jain, M.Tambe, and A.Taneja. 2023. "Expanding impact of mobile health programs: SAHELI for maternal and child care." AI Magazine 44: 363–376. https://doi.org/10.1002/aaai.12126 (CC BY-NC-ND 4.0) © The Authors, 2023. All rights reserved.`
+  },
+  {
+    id: `79`,
+    name: `Diagram of the Social Choice Language Model`,
+    location: `UAI.EDM.1`,
+    unit: `L3.12`,
+    lecture: `Aligning Goals: Competing Objectives in Resource Allocation`,
+    citation: `Figure 3. Overview of Social Choice Language Model (SCLM) from "Balancing Act: Prioritization Strategies for LLM-Designed Restless Bandit Rewards." by Verma, Boehmer, Kong, Tambe. (CC BY 4.0.)`
+  },
+  {
+    id: `80`,
+    name: `NY Times Newly Created Deserts map`,
+    location: `UAI.EDM.1`,
+    unit: `L3.12`,
+    lecture: `Aligning Goals: Competing Objectives in Resource Allocation`,
+    citation: `Screenshot of Newly created pharmacy deserts map by Karl Russell from The New York Times article, "The Powerful Companies Driving Local Drugstores Out of Business" by Reed Abelson and Rebecca Robbins © The New York Times Company, 2024. All rights reserved.`
+  },
+  {
+    id: `81`,
+    name: `Screenshot of the interactive dashboard Medical deserts in Arkansas`,
+    location: `UAI.EDM.1`,
+    unit: `L3.12`,
+    lecture: `Aligning Goals: Competing Objectives in Resource Allocation`,
+    citation: `Screenshot of streamlit app interactive dashboard, "Medical deserts in Arkansas." Streamlit App created by Swati Gupta, Jai Moondra, and Mohit Singh. © Swati Gupta, Jai Moondra, Mohit Singh. Used with permission.`
+  },
+  {
+    id: `82`,
+    name: `Image of a human hand and a robotic hand touching fingertips`,
+    location: `UAI.EDM.1`,
+    unit: `L3.13`,
+    lecture: `Other Strategies for Building Ethical Systems`,
+    citation: `Image from "The Future of Work: AI and Human Collaboration" by Shashikant Kalsha, Qodequay Technologies © qodequay technologies, 2025. All rights reserved.`
+  },
+  {
+    id: `83`,
+    name: `Photo of parole hearing`,
+    location: `UAI.EDM.1`,
+    unit: `L3.2`,
+    lecture: `Detecting and Diagnosing Problems: Detecting Issues in Algorithmic Parole Decisions`,
+    citation: `Inmates sit just a few feet from the bench at NH's Adult Parole Board hearings. Photo by Emily Corwin / NHPR © New Hampshire Public Radio, 2017. All rights reserved.`
+  },
+  {
+    id: `84`,
+    name: `Screenshot of "Prisons turn to analytics software for parole decisions" article`,
+    location: `UAI.EDM.1`,
+    unit: `L3.2`,
+    lecture: `Detecting and Diagnosing Problems: Detecting Issues in Algorithmic Parole Decisions`,
+    citation: `Screenshot of "Prisons turn to analytics software for parole decisions" Route Fifty article by Kevin McCaney © Government Media Executive Group LLC, 2013. All rights reserved.`
+  },
+  {
+    id: `85`,
+    name: `Real World vs Data cartoon`,
+    location: `UAI.EDM.1`,
+    unit: `L3.5`,
+    lecture: `Handling Noise: Handling Missing and Erroneous Data`,
+    citation: `Real World vs Data #3. cartoon by Piotr Kononow © Dataedo. All rights reserved.`
+  },
+  {
+    id: `86`,
+    name: `Highway viewed through lens image`,
+    location: `UAI.EDM.1`,
+    unit: `L3.5`,
+    lecture: `Handling Noise: Handling Missing and Erroneous Data`,
+    citation: `Wallpaper-1878419 image by user Lawyer 42 via Flickr. All rights reserved.`
+  },
+  {
+    id: `87`,
+    name: `Excerpt screenshot from Epidemiology and Costs`,
+    location: `UAI.EDM.1`,
+    unit: `L3.6`,
+    lecture: `Handling Noise: Incorporating Domain Knowledge by Understanding Interdependencies in Data`,
+    citation: `Screenshots of journal article "Epidemiology and Costs of Sepsis in the United States—An Analysis Based on Timing of Diagnosis and Severity Level" © The Author(s), 2018. Published by Wolters Kluwer Health, Inc. on behalf of the Society of Critical Care Medicine and Wolters Kluwer Health, Inc. All rights reserved.`
+  },
+  {
+    id: `88`,
+    name: `Homeostasis constraints figure`,
+    location: `UAI.EDM.1`,
+    unit: `L3.6`,
+    lecture: `Handling Noise: Incorporating Domain Knowledge by Understanding Interdependencies in Data`,
+    citation: `Trust-MAPS figure from Arora, Mehak et al. "Improving clinical decision support through interpretable machine learning and error handling in electronic health records." Journal of the American Medical Informatics Association : JAMIA (2023) (CC BY 4.0)`
+  },
+  {
+    id: `89`,
+    name: `Racial Bias in Health Care and Health: Challenges and Opportunities`,
+    location: `UAI.EDM.1`,
+    unit: `L3.6`,
+    lecture: `Handling Noise: Incorporating Domain Knowledge by Understanding Interdependencies in Data`,
+    citation: `Screenshot of "Racial Bias in Health Care and Health: Challenges and Opportunities" article, JAMA © American Medical Association, 2015. All rights reserved.`
+  },
+  {
+    id: `90`,
+    name: `Secondary EMR data for quality improvement and research`,
+    location: `UAI.EDM.1`,
+    unit: `L3.6`,
+    lecture: `Handling Noise: Incorporating Domain Knowledge by Understanding Interdependencies in Data`,
+    citation: `Screenshot of Brundin-Mather, Rebecca et al. "Secondary EMR data for quality improvement and research: A comparison of manual and electronic data collection from an integrated critical care electronic medical record system," Journal of Critical Care, Volume 47, 2018," article. © Elsevier Inc., 2018. All rights reserved.`
+  },
+  {
+    id: `91`,
+    name: `Screenshot of New England Journal of Medicine article`,
+    location: `UAI.EDM.1`,
+    unit: `L3.6`,
+    lecture: `Handling Noise: Incorporating Domain Knowledge by Understanding Interdependencies in Data`,
+    citation: `Screenshot of Sjoding, Michael W, et al. "Racial Bias in Pulse Oximetry Measurement." The New England Journal of Medicine [United States], vol. 383, no. 25, December 2020, pp. 2477–78 © Massachusetts Medical Society, 2020. All rights reserved.`
+  },
+  {
+    id: `92`,
+    name: `Photograph of a hand wearing a fingertip pulse`,
+    location: `UAI.EDM.1`,
+    unit: `L3.6`,
+    lecture: `Handling Noise: Incorporating Domain Knowledge by Understanding Interdependencies in Data`,
+    citation: `A Person Using a Pulse Oximeter photo by Stanley Ng via Pexels`
+  },
+  {
+    id: `93`,
+    name: `Screenshot of Forbes article "Unlocking The Power Of Industry Domain Expertise In A Technology Team"`,
+    location: `UAI.EDM.1`,
+    unit: `L3.6`,
+    lecture: `Handling Noise: Incorporating Domain Knowledge by Understanding Interdependencies in Data`,
+    citation: `Screenshot of Forbes article "Unlocking The Power Of Industry Domain Expertise In A Technology Team" by Ted Levine © Forbes Media LLC, 2023. All rights reserved.`
+  },
+  {
+    id: `94`,
+    name: `Data Cleansing cartoon`,
+    location: `UAI.EDM.1`,
+    unit: `L3.7`,
+    lecture: `Handling Noise: Correcting Labels in Biased Data Sets`,
+    citation: `Data Cleansing cartoon by Piotr Kononow © Dataedo, 2022. All rights reserved.`
+  },
+  {
+    id: `95`,
+    name: `Image showing four mugshots`,
+    location: `UAI.EDM.1`,
+    unit: `L3.7`,
+    lecture: `Handling Noise: Correcting Labels in Biased Data Sets`,
+    citation: `Machine bias mugshot images from "Mugshot Machine Bias: There's Software Used Across the Country to Predict Future Criminals. And It's Biased Against Blacks" by Julia Angwin, Jeff Larson, Surya Mattu and Lauren Kirchner, ProPublica © Pro Publica, Inc., 2016. All rights reserved.`
+  },
+  {
+    id: `96`,
+    name: `Data Warehouse vs Data Lake cartoon`,
+    location: `UAI.EDM.1`,
+    unit: `L3.8`,
+    lecture: `Handling Noise: Embedding Data with Foundational Models`,
+    citation: `Data Warehouse vs Data Lake #1: The wardrobe cartoon by Piotr Kononow © Dataedo, 2023. All rights reserved.`
+  },
+  {
+    id: `97`,
+    name: `Illustration explaining word embeddings`,
+    location: `UAI.EDM.1`,
+    unit: `L3.8`,
+    lecture: `Handling Noise: Embedding Data with Foundational Models`,
+    citation: `Word embedding diagram from "Word embedding" by Amirhossein Abaskohi via medium.com © Amirhossein Abaskohi, 2021. All rights reserved.`
+  },
+  {
+    id: `98`,
+    name: `Framework diagram`,
+    location: `UAI.EDM.1`,
+    unit: `L3.8`,
+    lecture: `Handling Noise: Embedding Data with Foundational Models`,
+    citation: `Figure 1 from Carballo, K. V., Na, L., Ma, Y., Boussioux, L., Zeng, C., Soenksen, L. R., & Bertsimas, D. (2022). "TabText: Language-Based Representations of Tabular Health Data for Predictive Modelling." arXiv:2206.10381. (CC BY 4.0)`
+  },
+  {
+    id: `99`,
+    name: `Claude logo`,
+    location: `UAI.EDM.1`,
+    unit: `L3.8`,
+    lecture: `Handling Noise: Embedding Data with Foundational Models`,
+    citation: `Claude logo © Anthropic PBC. All rights reserved.`
+  },
+  {
+    id: `100`,
+    name: `DeepSeek logo`,
+    location: `UAI.EDM.1`,
+    unit: `L3.8`,
+    lecture: `Handling Noise: Embedding Data with Foundational Models`,
+    citation: `DeepSeek logo © DeepSeek. All rights reserved.`
+  },
+  {
+    id: `101`,
+    name: `OpenAI logo (ChatGPT swirl)`,
+    location: `UAI.EDM.1`,
+    unit: `L3.8`,
+    lecture: `Handling Noise: Embedding Data with Foundational Models`,
+    citation: `OpenAI logo © OpenAI. All rights reserved.`
+  },
+  {
+    id: `102`,
+    name: `Screenshot of "Hi, I'm Z.ai" chatbot`,
+    location: `UAI.EDM.1`,
+    unit: `L3.8`,
+    lecture: `Handling Noise: Embedding Data with Foundational Models`,
+    citation: `Screenshot of "Hi, I'm Z.ai chatbot © Z.ai. All rights reserved.`
+  },
+  {
+    id: `103`,
+    name: `Gemini logo`,
+    location: `UAI.EDM.1`,
+    unit: `L3.8`,
+    lecture: `Handling Noise: Embedding Data with Foundational Models`,
+    citation: `Gemini logo © Google, Inc. All rights reserved.`
+  },
+  {
+    id: `104`,
+    name: `Image of robot misidentifying a donut as a lifebuoy`,
+    location: `UAI.EDM.1`,
+    unit: `L3.9`,
+    lecture: `Handling Noise: Data and Model Uncertainty`,
+    citation: `Image of robot misidentifying a donut as a lifebuoy from "The Misadventures of AI: The Funny Fails and Fixes" by Ilin Tabanliev © Scalefocus AD, 2024. All rights reserved.`
+  },
+  {
+    id: `105`,
+    name: `Image of street people painting`,
+    location: `UAI.EDM.1`,
+    unit: `L3.9`,
+    lecture: `Handling Noise: Data and Model Uncertainty`,
+    citation: `Image of painting by Philip Barlow. "return - 150cm x 225cm, oil on cavas" © Philip Barlow. All rights reserved.`
+  },
+  {
+    id: `106`,
+    name: `Light bulb drawing image`,
+    location: `UAI.EDM.1`,
+    unit: `L3.9`,
+    lecture: `Handling Noise: Data and Model Uncertainty`,
+    citation: `Image from "How to Draw a Light Bulb – Step by Step Guide" by Sladjana, iHeartCraftyThings.com © iHeartCraftyThings. All rights reserved`
+  },
+
+];
+
+let filtered = [...RAW_RECORDS];
+
+function escapeHtml(t) {
+  const d = document.createElement('div');
+  d.textContent = t || '';
+  return d.innerHTML;
+}
+
+function populateFilters() {
+  const units = [...new Set(RAW_RECORDS.map(r => r.unit))].filter(Boolean).sort();
+  const lectures = [...new Set(RAW_RECORDS.map(r => r.lecture))].filter(Boolean).sort();
+  const mSel = document.getElementById('moduleFilter');
+  const lSel = document.getElementById('lectureFilter');
+  units.forEach(u => {
+    const o = document.createElement('option');
+    o.value = u; o.textContent = u;
+    mSel.appendChild(o);
+  });
+  lectures.forEach(l => {
+    const o = document.createElement('option');
+    o.value = l;
+    o.textContent = l.includes('—') ? l.split('—').slice(1).join('—').trim() : l;
+    lSel.appendChild(o);
+  });
+}
+
+function filterResults() {
+  const term = document.getElementById('searchInput').value.toLowerCase();
+  const mod = document.getElementById('moduleFilter').value;
+  const lec = document.getElementById('lectureFilter').value;
+  filtered = RAW_RECORDS.filter(r => {
+    const matchSearch = !term ||
+      r.name.toLowerCase().includes(term) ||
+      r.location.toLowerCase().includes(term) ||
+      r.unit.toLowerCase().includes(term) ||
+      r.lecture.toLowerCase().includes(term) ||
+      r.citation.toLowerCase().includes(term);
+    const matchMod = !mod || r.unit === mod;
+    const matchLec = !lec || r.lecture === lec;
+    return matchSearch && matchMod && matchLec;
+  });
+  displayResults();
+}
+
+function displayResults() {
+  const grid = document.getElementById('attributionGrid');
+  const noRes = document.getElementById('noResults');
+  const info = document.getElementById('resultsInfo');
+  const total = RAW_RECORDS.length;
+  const count = filtered.length;
+
+  if (count === 0) {
+    info.innerHTML = '<div class="results-count">No attribution records found</div>';
+    grid.style.display = 'none';
+    noRes.style.display = 'block';
+    return;
+  }
+
+  info.innerHTML = `<div class="results-count">${count === total ? 'Showing all ' + total : 'Showing ' + count + ' of ' + total} attribution records</div>`;
+  grid.style.display = 'grid';
+  noRes.style.display = 'none';
+
+  grid.innerHTML = filtered.map((r, i) => `
+    <article class="attribution-card" tabindex="0"
+      aria-setsize="${count}" aria-posinset="${i + 1}" aria-labelledby="title-${r.id}">
+      <h3 class="card-title" id="title-${r.id}">${escapeHtml(r.name)}</h3>
+      <div class="card-details">
+        <div class="detail-row">
+          <span class="detail-label">Location:</span>
+          <span class="detail-value">${escapeHtml(r.location)}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Unit:</span>
+          <span class="detail-value">${escapeHtml(r.unit)}</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Video:</span>
+          <span class="detail-value">${escapeHtml(r.lecture.includes('—') ? r.lecture.split('—').slice(1).join('—').trim() : r.lecture)}</span>
+        </div>
+      </div>
+      <div class="citation">
+        <div class="citation-label">Citation and Attribution</div>
+        <div class="citation-text">${escapeHtml(r.citation)}</div>
+      </div>
+    </article>
+  `).join('');
+}
+
+function clearFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('moduleFilter').value = '';
+  document.getElementById('lectureFilter').value = '';
+  filterResults();
+  setTimeout(() => document.getElementById('searchInput').focus(), 100);
+}
+
+let debounceTimer;
+document.getElementById('searchInput').addEventListener('input', () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(filterResults, 300);
+});
+document.getElementById('searchInput').addEventListener('keydown', e => {
+  if (e.key === 'Escape') { e.target.value = ''; filterResults(); }
+});
+document.getElementById('moduleFilter').addEventListener('change', filterResults);
+document.getElementById('lectureFilter').addEventListener('change', filterResults);
+
+populateFilters();
+displayResults();
+</script>
+</body>
+</html>
