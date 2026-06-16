@@ -67,10 +67,10 @@
 </header><main id="main-content">
 <section id="search" role="search" aria-labelledby="search-heading">
 <h2 id="search-heading" class="sr-only">Search and Filter Attribution Records</h2>
-<label for="searchInput" class="sr-only">Search attributions by name, description, location, or citation text</label> <input type="search" class="search-input" id="searchInput" placeholder="Search by name, description, location, or citation..." autocomplete="off" aria-label="Search attribution records" />
+<label for="searchInput" class="sr-only">Search attributions by name, location, unit, video, or citation text</label> <input type="search" class="search-input" id="searchInput" placeholder="Search by name, location, unit, video, or citation..." autocomplete="off" aria-label="Search attribution records" />
 <div class="filters">
 <div class="filter-group"><label for="moduleFilter">Lecture or Unit</label><select class="filter-select" id="moduleFilter">
-<option value="">All Lectures</option>
+<option value="">All Units</option>
 </select></div>
 <div class="filter-group"><label for="lectureFilter">Lecture or Video</label><select class="filter-select" id="lectureFilter">
 <option value="">All Lectures</option>
@@ -142,7 +142,7 @@ function populateFilters() {
   lectures.forEach(l => {
     const o = document.createElement('option');
     o.value = l;
-    o.textContent = l.includes('—') ? l.split('—').slice(1).join('—').trim() : l;
+    o.textContent = l;
     lSel.appendChild(o);
   });
 }
@@ -152,12 +152,9 @@ function filterResults() {
   const mod = document.getElementById('moduleFilter').value;
   const lec = document.getElementById('lectureFilter').value;
   filtered = RAW_RECORDS.filter(r => {
-    const matchSearch = !term ||
-      r.name.toLowerCase().includes(term) ||
-      r.location.toLowerCase().includes(term) ||
-      r.unit.toLowerCase().includes(term) ||
-      r.lecture.toLowerCase().includes(term) ||
-      r.citation.toLowerCase().includes(term);
+    const haystack = [r.name, r.location, r.unit, r.lecture, r.citation]
+      .map(v => (v || '').toLowerCase());
+    const matchSearch = !term || haystack.some(v => v.includes(term));
     const matchMod = !mod || splitValues(r.unit).includes(mod);
     const matchLec = !lec || splitValues(r.lecture).includes(lec);
     return matchSearch && matchMod && matchLec;
@@ -198,7 +195,7 @@ function displayResults() {
         </div>
         <div class="detail-row">
           <span class="detail-label">Video:</span>
-          <span class="detail-value">${escapeHtml(r.lecture.includes('—') ? r.lecture.split('—').slice(1).join('—').trim() : r.lecture)}</span>
+          <span class="detail-value">${escapeHtml(r.lecture)}</span>
         </div>
       </div>
       <div class="citation">
